@@ -4,6 +4,7 @@ import com.north.managesystem.common.CommonDto;
 import com.north.managesystem.common.PageDto;
 import com.north.managesystem.pojo.User;
 import com.north.managesystem.service.UserService;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -49,6 +50,19 @@ public class UserController {
             commonDto.setMessage("更改成功");
         }else{
             commonDto.setMessage("更改失败");
+        }
+        return commonDto;
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public CommonDto delete(@PathVariable int id){
+        CommonDto<User> commonDto = new CommonDto<>();
+        boolean b = userService.removeById(id);
+        if(!b){
+            commonDto.setMessage("删除失败");
+            return commonDto;
+        }else {
+            commonDto.setMessage("删除成功");
         }
         return commonDto;
     }

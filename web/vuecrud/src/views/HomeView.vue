@@ -26,7 +26,7 @@
             <el-button
                 size="mini"
                 type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -43,7 +43,7 @@
 
     </el-card>
 
-    <el-dialog title="新增员工" :visible.sync="dialogFormVisible1" width="40%" center>
+    <el-dialog title="新增员工" :visible.sync="dialogFormVisible" width="40%" center>
       <el-form :model="form" :rules="rules" ref="formName">
         <el-form-item label="姓名" :label-width="formLabelWidth" prop="username">
           <el-input style="width: 90%" v-model="form.username" autocomplete="off"></el-input>
@@ -82,7 +82,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="修改信息" :visible.sync="dialogFormVisible" width="40%" center>
+    <el-dialog title="修改信息" :visible.sync="dialogFormVisible1" width="40%" center>
       <el-form :model="form" :rules="rules" ref="formName">
         <el-form-item label="姓名" :label-width="formLabelWidth" prop="username">
           <el-input style="width: 90%" v-model="form.username" autocomplete="off"></el-input>
@@ -116,7 +116,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="dialogFormVisible1 = false">取 消</el-button>
         <el-button type="primary" @click="submitForm()">确 定</el-button>
       </div>
     </el-dialog>
@@ -194,7 +194,7 @@ export default {
               this.$refs.formName.resetFields();
               this.getUserList();
               this.$message({
-                message: '操作成功！',
+                message: resp.data.message,
                 type: 'success'
               });
             }
@@ -210,8 +210,27 @@ export default {
       this.form = row;
       this.dialogFormVisible = true;
     },
-    handleDelete(index, row) {
-      console.log(index, row);
+    handleDelete(row) {
+      let id = row.id;
+      console.log(row, "handleDelete");
+      this.axios.delete("http://localhost:9090/user/delete/"+id).then((resp) => {
+        let data = resp.data;
+        console.log(resp)
+        if(data.success){
+          this.getUserList();
+          this.$message({
+            message: resp.data.message,
+            type: 'success'
+          });
+        }
+        else{
+          this.$message({
+            message: resp.data.message,
+            type: 'error'
+          });
+        }
+      }
+      )
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
