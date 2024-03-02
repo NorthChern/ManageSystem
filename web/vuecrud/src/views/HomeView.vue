@@ -18,6 +18,16 @@
         <el-table-column prop="email" label="邮箱"></el-table-column>
         <el-table-column prop="joinDate" label="入职日期"></el-table-column>
         <el-table-column prop="avatar" label="头像"></el-table-column>
+        <el-table-column label="头像">
+          <template slot-scope="scope">
+            <el-popover
+                placement="top-start"
+                trigger="hover">
+              <img :src="form.avatar" alt="User Avatar" v-if="form.avatar" />
+              <img :src="scope.row.avatar" slot="reference" style="width: 50px; height: 50px;">
+            </el-popover>
+          </template>
+        </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
@@ -70,7 +80,14 @@
           <el-input style="width: 90%" v-model="form.joinDate" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
-          <el-input style="width: 90%" v-model="form.avatar" autocomplete="off"></el-input>
+          <el-upload
+              class="avatar-uploader"
+              action="http://localhost:9090/common/upload?module=avatar"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess">
+            <img v-if="form.avatar" :src="form.avatar" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
         <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
         <el-input style="width: 90%" v-model="form.password" autocomplete="off"></el-input>
@@ -109,7 +126,13 @@
           <el-input style="width: 90%" v-model="form.joinDate" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
-          <el-input style="width: 90%" v-model="form.avatar" autocomplete="off"></el-input>
+          <el-upload
+              class="avatar-uploader"
+              action="http://localhost:9090/common/upload?module=avatar"
+              :on-success="handleAvatarSuccess">
+            <img v-if="form.avatar" :src="form.avatar" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
         <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
           <el-input style="width: 90%" v-model="form.password" autocomplete="off"></el-input>
@@ -127,6 +150,8 @@
 
 <script>
 
+import axios from "axios";
+
 export default {
   name: 'HomeView',
   data(){
@@ -136,6 +161,7 @@ export default {
         size: 5,
         username: "",
       },
+      selectedFile: null,
       total:0,
       currentPage: 1,
       tableData: [],
@@ -173,6 +199,14 @@ export default {
     }
   },
   methods: {
+    handleAvatarSuccess(res, file) {
+      this.form.avatar = `http://localhost:9090/files/download?name=${res.content}`;
+      //校验
+      this.$refs.formName.validateField("avatar");
+      //强制刷新
+      this.$forceUpdate();
+    },
+
     //点击新增弹出弹窗
     handleCreate() {
       this.form={};
@@ -262,3 +296,29 @@ export default {
   }
 }
 </script>
+
+<style>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 100px;
+  color: #8c939d;
+  width: 178px;
+  height: 150px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+</style>
