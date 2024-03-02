@@ -35,11 +35,11 @@
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
-          :current-page="currentPage"
+          :current-page="this.query.page"
           :page-sizes="[5, 10, 20, 30]"
-          :page-size="100"
+          :page-size="this.query.size"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="400">
+          :total="this.total">
       </el-pagination>
 
     </el-card>
@@ -58,7 +58,8 @@ export default {
         size: 5,
         username: ""
       },
-      currentPage: 4,
+      total:0,
+      currentPage: 1,
       tableData: []
     }
   },
@@ -71,21 +72,29 @@ export default {
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
+      this.query.size = val;
+      this.getUserList();
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
+      this.query.page = val;
+      this.getUserList();
     },
     getUserList() {
       this.axios.get("http://localhost:9090/user/getList",{
         params:{
-          username: this.query.username
+          username: this.query.username,
+          page:this.query.page,
+          size:this.query.size
         }
       }).then((resp) => {
         console.log(resp)
-        this.tableData = resp.data.content;
+        this.tableData = resp.data.content.list;
+        this.total = resp.data.content.total
       })
     }
   },
+  //页面渲染时加载数据
   created() {
     this.getUserList();
   }

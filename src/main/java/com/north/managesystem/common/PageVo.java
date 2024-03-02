@@ -13,7 +13,7 @@ public class PageVo {
     @TableField(exist = false)
     private int page;
 
-    //每页
+    //每页大小
     @TableField(exist = false)
     private int size;
 }

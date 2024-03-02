@@ -1,6 +1,7 @@
 package com.north.managesystem.controller;
 
 import com.north.managesystem.common.CommonDto;
+import com.north.managesystem.common.PageDto;
 import com.north.managesystem.pojo.User;
 import com.north.managesystem.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,8 +36,9 @@ public class UserController {
     @GetMapping("/getList")
     public CommonDto getList(User user){
 
-        CommonDto<Object> commonDto = new CommonDto<>();
-        List list = userService.getList(user);
+        //commonDto封装PageDto将分页数据传给前端
+        CommonDto<PageDto<User>> commonDto = new CommonDto<>();
+        PageDto<User> list = userService.getList(user);
         commonDto.setContent(list);
         return commonDto;
     }

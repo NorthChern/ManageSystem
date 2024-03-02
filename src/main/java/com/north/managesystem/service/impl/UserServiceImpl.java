@@ -2,7 +2,9 @@ package com.north.managesystem.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.north.managesystem.common.PageDto;
 import com.north.managesystem.mapper.UserMapper;
 import com.north.managesystem.pojo.User;
 import com.north.managesystem.service.UserService;
@@ -18,7 +20,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserMapper userMapper;
 
     @Override
-    public List getList(User user) {
+    public PageDto<User> getList(User user) {
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
 
@@ -27,7 +29,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             //进行模糊查询
             queryWrapper.lambda().like(User::getUsername, user.getUsername());
         }
-        List<User> userList = userMapper.selectList(queryWrapper);
-        return userList;
+        //将当前页和条数封装到Page对象
+        Page<User> page = new Page<>(user.getPage(), user.getSize());
+        //
+        Page<User> selectPage = userMapper.selectPage(page, queryWrapper);
+
+        PageDto<User> pageDto = new PageDto<>();
+        //存放总条数
+        pageDto.setTotal(selectPage.getTotal());
+        //存放数据
+        pageDto.setList(selectPage.getRecords());
+        return pageDto;
     }
 }
