@@ -4,9 +4,7 @@ import com.north.managesystem.common.CommonDto;
 import com.north.managesystem.common.PageDto;
 import com.north.managesystem.pojo.User;
 import com.north.managesystem.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -40,6 +38,18 @@ public class UserController {
         CommonDto<PageDto<User>> commonDto = new CommonDto<>();
         PageDto<User> list = userService.getList(user);
         commonDto.setContent(list);
+        return commonDto;
+    }
+
+    @PostMapping("/saveOrUpdate")
+    public CommonDto saveOrUpdate(@RequestBody User user){
+        CommonDto<User> commonDto = new CommonDto<>();
+        boolean b = userService.saveOrUpdate(user);
+        if(b){
+            commonDto.setMessage("更改成功");
+        }else{
+            commonDto.setMessage("更改失败");
+        }
         return commonDto;
     }
 
